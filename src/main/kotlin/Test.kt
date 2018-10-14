@@ -22,9 +22,9 @@ fun main(args: Array<String>) {
             .executor(ex)
             .buildAsync(loader)
     loader.cache = cache
-    val ints = arrayOf(45, 46, 47, 48, 49, 50, 50, 1000, 1000)
+    val ints = arrayOf(10, 11)
     val threads = ArrayList<Thread>()
-    for (int in range(1, 21)) {
+    for (int in range(1, 2)) {
         val loaderThread = LoaderThread("Thread $int", ints, dbLoader, cache)
         loaderThread.start()
         threads.add(loaderThread)
@@ -36,7 +36,7 @@ fun main(args: Array<String>) {
 }
 
 class LoaderThread(val prefix: String, val ints: Array<Int>, val dbLoader: DbLoader, val cache: AsyncLoadingCache<Key, Value>) : Thread() {
-    val keys = range(1, 1000).mapToObj { e -> "$prefix: $e" }.toList()
+    val keys = range(1, 10).mapToObj { e -> "$prefix: $e" }.toList()
 
     init {
         isDaemon = true
@@ -119,6 +119,7 @@ class DbLoader {
     var loads = 0
     private val r = Random()
     fun getAll(keys: List<Key>): MutableMap<Key, Value> {
+        println("Loading from db ${keys.toList().sortedBy { it.key }}")
         val out = HashMap<Key, Value>()
         for (key in keys) {
             if (r.nextInt(100) < 10) {
@@ -129,6 +130,7 @@ class DbLoader {
         }
         Thread.sleep(10)
         loads++
+        println("Returning $out")
         return out
     }
 }
